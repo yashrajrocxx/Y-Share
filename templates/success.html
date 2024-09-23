@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Download Successful</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script>
+        window.onload = function() {
+            const filename = "{{ filename }}";
+            const link = document.createElement('a');
+            link.href = "/dir/" + filename;  // Adjust the path as necessary
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Your file has been decrypted and is ready for download!</h1>
+        <p>The download should start automatically.</p>
+    </div>
+</body>
+</html>

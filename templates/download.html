@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Download Image</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <form method="POST" action="">
+        <h1>Download Your Image</h1>
+        <label for="key">Enter your encryption key:</label>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul>
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+        <input type="text" name="key" required>
+        <button type="submit">Download</button>
+    </form>
+</body>
+</html>

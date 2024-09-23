@@ -1,0 +1,179 @@
+/* General Styles for All Pages */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f0f4f8;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    transition: background-color 0.3s ease;
+}
+
+.container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    max-width: 400px;
+    width: 90%; /* Changed to 90% for mobile responsiveness */
+    text-align: center;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+h1 {
+    font-size: 1.8em;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+p {
+    font-size: 1.1em;
+    color: #555;
+}
+
+strong {
+    color: #1976d2; /* Primary Color */
+}
+
+/* Form Styles */
+form {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    max-width: 400px;
+    width: 90%; /* Changed to 90% for mobile responsiveness */
+    text-align: center;
+}
+
+label {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+input[type="file"],
+input[type="text"] {
+    width: 90%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1em;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input[type="file"] {
+    border: none;
+    margin-bottom: 30px;
+}
+
+input:focus {
+    outline: none;
+    border-color: #1976d2;
+    box-shadow: 0 0 5px rgba(25, 118, 210, 0.5);
+}
+
+/* Animation for Input Fields */
+input {
+    animation: grow 0.3s ease forwards;
+}
+
+@keyframes grow {
+    from {
+        transform: scale(1);
+    }
+    to {
+        transform: scale(1.02);
+    }
+}
+
+button {
+    background-color: #1976d2; /* Primary Color */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1.1em;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    width: 90%; /* Changed to 90% for mobile responsiveness */
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+button:hover {
+    background-color: #0d47a1; /* Darker Shade */
+    transform: translateY(-2px);
+}
+
+.buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+button + button {
+    margin-top: 10px;
+}
+
+/* Copy Alert */
+.alert {
+    color: green;
+    margin-top: 10px;
+}
+
+/* Links */
+a {
+    color: #1976d2; /* Primary Color */
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Flash Message Styling */
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 10px;
+}
+
+li {
+    background-color: #f44336; /* Error Color */
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+/* Responsive Styles */
+@media (max-width: 600px) {
+    h1 {
+        font-size: 1.5em; /* Adjust heading size for mobile */
+    }
+
+    p {
+        font-size: 1em; /* Adjust paragraph size for mobile */
+    }
+
+    input[type="file"],
+    input[type="text"] {
+        font-size: 0.9em; /* Smaller input font size */
+    }
+
+    button {
+        font-size: 1em; /* Adjust button font size */
+    }
+}

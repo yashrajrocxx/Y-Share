@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Encryption Key</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script>
+        function copyToClipboard(text) {
+            const tempInput = document.createElement('input');
+            document.body.appendChild(tempInput);
+            tempInput.value = text;
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            alert('Copied to clipboard');
+        }
+
+        // Function to copy the URL and Key together
+        function copyKeyAndUrl() {
+            const key = document.getElementById('keyText').innerText;
+            const url = document.getElementById('downloadLink').innerText;
+            const textToCopy = `Download URL: ${url}\n Key: ${key}`;
+            copyToClipboard(textToCopy);
+        }
+
+        // Function to copy the direct download link with key as query
+        function copyDirectDownloadLink() {
+            const key = document.getElementById('keyText').innerText;
+            const url = document.getElementById('downloadLink').innerText;
+            const directLink = `${url}?key=${key}`;
+            copyToClipboard(directLink);
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Image Encrypted Successfully!</h1>
+
+        <p>Your Key: <strong id="keyText">{{ key }}</strong></p>
+        <p>Download Link: <strong id="downloadLink">{{ download_link }}</strong></p>
+
+        <div class="buttons">
+            <button onclick="copyKeyAndUrl()">Copy URL & Key</button>
+            <button onclick="copyDirectDownloadLink()">Copy Direct Download Link</button>
+        </div>
+
+        <p>Keep your key safe! You will need it to download the encrypted image.</p>
+    </div>
+</body>
+</html>
