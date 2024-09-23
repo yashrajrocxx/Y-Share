@@ -1,6 +1,7 @@
 import os
 import json
 import socket
+import zipfile
 from uuid import uuid4
 from random import choices
 from threading import Timer
@@ -27,8 +28,6 @@ TEMPDIR = "temp"
 
 
 # Utility functions
-
-
 def get_local_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
@@ -67,8 +66,6 @@ def update_json_file(updated_data):
 
 
 # Routes
-
-
 @app.route("/")
 def index():
     return render_template("upload.html")
@@ -76,16 +73,32 @@ def index():
 
 @app.route("/upload", methods=["POST"])
 def upload_file():
-    if "file" not in request.files or request.files["file"].filename == "":
+    files = request.files.getlist("files")
+
+    if not files or all(f.filename == "" for f in files):
         return redirect(request.url)
 
-    file = request.files["file"]
     filename = str(uuid4())
     filepath = os.path.join(TEMPDIR, filename)
-    file.save(filepath)
+
+    if len(files) == 1:
+        file = files[0]
+        file.save(filepath)
+        ori_name = file.filename
+
+    else:
+        with zipfile.ZipFile(filepath, "w") as zipf:
+            for file in files:
+                _filename = file.filename
+                file.save(os.path.join(TEMPDIR, _filename))
+                zipf.write(os.path.join(TEMPDIR, _filename), _filename)
+
+        ori_name = f"{filename}.zip"
+        for file in files:
+            delete_files(os.path.join(TEMPDIR, file.filename))
 
     jsonfiles = get_json_file()
-    jsonfiles.update({filename: file.filename})
+    jsonfiles.update({filename: ori_name})
     update_json_file(jsonfiles)
 
     key = generate_key()
@@ -145,7 +158,6 @@ def download_page(filename):
             session["attempts"] = attempts
 
             if attempts >= app.config["MAX_ATTEMPTS"]:
-
                 jsonfiles = get_json_file()
                 jsonfiles.pop(filename, None)
                 update_json_file(jsonfiles)

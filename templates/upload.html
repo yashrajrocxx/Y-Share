@@ -2,14 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Image Encryption</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Files for Encryption</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <form method="post" action="/upload" enctype="multipart/form-data">
-        <h1>Upload an Image to Encrypt</h1>
-        <input type="file" name="file" accept="image/*" required>
-        <button type="submit">Upload</button>
-    </form>
+    <div class="container">
+        <form method="post" action="/upload" enctype="multipart/form-data">
+            <h1>Upload Files to Encrypt</h1>
+            <input type="file" name="files" accept="image/*" multiple required>
+            <button type="submit">
+                <i class="material-icons">cloud_upload</i> Upload
+            </button>
+        </form>
+    </div>
 </body>
 </html>
