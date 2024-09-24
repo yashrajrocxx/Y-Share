@@ -13,7 +13,6 @@ from flask import (
     render_template,
     request,
     redirect,
-    url_for,
     send_from_directory,
     flash,
     session,
@@ -38,6 +37,9 @@ def get_local_ip():
     finally:
         s.close()
     return ip_address
+
+
+BASE_URL = "https://q93659v0-5000.inc1.devtunnels.ms"  # f"http://{get_local_ip()}:5000"
 
 
 def generate_key():
@@ -119,7 +121,7 @@ def upload_file():
     session["attempts"] = 0
     delete_files(filepath)
 
-    download_url = f"http://{get_local_ip()}:5000/download/{filename}"
+    download_url = f"{BASE_URL}/download/{filename}"
 
     return render_template(
         "key_display.html",
@@ -133,6 +135,10 @@ def download_page(filename):
     user_key = request.args.get("key") or (
         request.form.get("key") if request.method == "POST" else None
     )
+
+    if str(user_key).startswith("Download"):
+        user_key = str(user_key).split(" ")[-1]
+
     attempts = session.get("attempts", 0)
     encrypted_filepath = os.path.join(app.config["ENCRYPTED_FOLDER"], filename)
 

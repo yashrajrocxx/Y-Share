@@ -9,14 +9,12 @@
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <div class="container">
-        <form method="post" action="/upload" enctype="multipart/form-data">
-            <h1>Upload Files to Encrypt</h1>
-            <input type="file" name="files" accept="image/*" multiple required>
-            <button type="submit">
-                <i class="material-icons">cloud_upload</i> Upload
-            </button>
-        </form>
-    </div>
+    <form method="post" action="/upload" enctype="multipart/form-data">
+        <h1>Upload Files to Encrypt</h1>
+        <input type="file" name="files" accept="image/*" multiple required>
+        <button type="submit">
+            <i class="material-icons">cloud_upload</i> Upload
+        </button>
+    </form>
 </body>
 </html>
