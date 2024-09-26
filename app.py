@@ -2,6 +2,7 @@ import os
 import json
 import socket
 import zipfile
+import tempfile
 from uuid import uuid4
 from random import choices
 from threading import Timer
@@ -23,7 +24,7 @@ app.secret_key = "piyush@11"
 app.config["MAX_ATTEMPTS"] = 3
 app.config["FILE_DELETION_TIME"] = 10  # Seconds
 app.config["ENCRYPTED_FOLDER"] = "encrypted"
-TEMPDIR = "temp"
+app.config["TEMPORARY_FOLDER"] = tempfile.gettempdir()
 
 
 # Utility functions
@@ -39,7 +40,7 @@ def get_local_ip():
     return ip_address
 
 
-BASE_URL = "https://q93659v0-5000.inc1.devtunnels.ms"  # f"http://{get_local_ip()}:5000"
+BASE_URL = f"http://{get_local_ip()}:5000"
 
 
 def generate_key():
@@ -50,11 +51,16 @@ def get_aes_key(key):
     return key.replace("-", "").encode()[:16].ljust(16, b"\0")
 
 
-def delete_files(*args):
-    for file in args:
+def delete_files(paths=[], filename=""):
+    for file in paths:
         if os.path.exists(file):
             os.remove(file)
             print(f"File deleted: {file}")
+
+    if filename:
+        jsonfiles = get_json_file()
+        jsonfiles.pop(filename, None)
+        update_json_file(jsonfiles)
 
 
 def get_json_file():
@@ -81,7 +87,7 @@ def upload_file():
         return redirect(request.url)
 
     filename = str(uuid4())
-    filepath = os.path.join(TEMPDIR, filename)
+    filepath = os.path.join(app.config["TEMPORARY_FOLDER"], filename)
 
     if len(files) == 1:
         file = files[0]
@@ -92,12 +98,16 @@ def upload_file():
         with zipfile.ZipFile(filepath, "w") as zipf:
             for file in files:
                 _filename = file.filename
-                file.save(os.path.join(TEMPDIR, _filename))
-                zipf.write(os.path.join(TEMPDIR, _filename), _filename)
+                file.save(os.path.join(app.config["TEMPORARY_FOLDER"], _filename))
+                zipf.write(
+                    os.path.join(app.config["TEMPORARY_FOLDER"], _filename), _filename
+                )
 
         ori_name = f"{filename}.zip"
         for file in files:
-            delete_files(os.path.join(TEMPDIR, file.filename))
+            delete_files(
+                paths=[os.path.join(app.config["TEMPORARY_FOLDER"], file.filename)]
+            )
 
     jsonfiles = get_json_file()
     jsonfiles.update({filename: ori_name})
@@ -119,7 +129,7 @@ def upload_file():
         ef.write(encrypted_data)
 
     session["attempts"] = 0
-    delete_files(filepath)
+    delete_files(paths=[filepath])
 
     download_url = f"{BASE_URL}/download/{filename}"
 
@@ -142,6 +152,13 @@ def download_page(filename):
     attempts = session.get("attempts", 0)
     encrypted_filepath = os.path.join(app.config["ENCRYPTED_FOLDER"], filename)
 
+    if not os.path.exists(encrypted_filepath):
+        return render_template(
+            "deleted.html",
+            filename=filename,
+            deletion_message="The file is already deleted.",
+        )
+
     if user_key:
         try:
             with open(encrypted_filepath, "rb") as ef:
@@ -152,7 +169,7 @@ def download_page(filename):
             cipher = AES.new(aes_key, AES.MODE_CBC, iv)
             decrypted_data = unpad(cipher.decrypt(encrypted_data), AES.block_size)
 
-            decrypted_filepath = os.path.join(TEMPDIR, filename)
+            decrypted_filepath = os.path.join(app.config["TEMPORARY_FOLDER"], filename)
             with open(decrypted_filepath, "wb") as df:
                 df.write(decrypted_data)
 
@@ -164,42 +181,40 @@ def download_page(filename):
             session["attempts"] = attempts
 
             if attempts >= app.config["MAX_ATTEMPTS"]:
-                jsonfiles = get_json_file()
-                jsonfiles.pop(filename, None)
-                update_json_file(jsonfiles)
-
-                delete_files(encrypted_filepath)
+                delete_files([encrypted_filepath], filename)
                 return render_template("deleted.html", filename=filename)
 
             flash(
                 f"Invalid key. You have {app.config['MAX_ATTEMPTS'] - attempts} attempts left."
             )
 
-    return render_template("download.html", filename=filename)
+    return render_template(
+        "download.html",
+        filename=filename,
+        deletion_message="The file was deleted due to too many failed attempts.",
+    )
 
 
 @app.route("/dir/<path:filename>")
 def temp_file(filename):
     jsonfiles = get_json_file()
     ori_filename = jsonfiles[filename]
-    jsonfiles.pop(filename, None)
-    update_json_file(jsonfiles)
 
     encrypted_filepath = os.path.join(app.config["ENCRYPTED_FOLDER"], filename)
-    decrypted_filepath = os.path.join(TEMPDIR, filename)
+    decrypted_filepath = os.path.join(app.config["TEMPORARY_FOLDER"], filename)
 
     bg = Timer(
         app.config["FILE_DELETION_TIME"],
         delete_files,
-        args=(
-            encrypted_filepath,
-            decrypted_filepath,
-        ),
+        args=([encrypted_filepath, decrypted_filepath], filename),
     )
     bg.start()
 
     return send_from_directory(
-        TEMPDIR, filename, as_attachment=True, download_name=ori_filename
+        app.config["TEMPORARY_FOLDER"],
+        filename,
+        as_attachment=True,
+        download_name=ori_filename,
     )
 
 
